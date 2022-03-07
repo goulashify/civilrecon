@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Civil Reconnaissance{% endblock %}
+{% block main %}
+    <section>
+        <h1>Civil Reconnaissance</h1>
+        <p>Please accept the location request, this is needed to know where you are reporting enemy troops.</p>
+        <form method="post">
+            <input hidden name="latitude" required/>
+            <input hidden name="longitude" required/>
+
+            <label>
+                <b>Latitude:</b>
+                <span id="latitude">locating...</span>
+            </label>
+            <label>
+                <b>Longitude:</b>
+                <span id="longitude">locating...</span>
+            </label>
+            <label>
+                <b>Soldiers:</b>
+                <input name="soldier_count" value="0" type="number" required/>
+            </label>
+            <label>
+                <b>Tanks:</b>
+                <input name="tank_count" value="0" type="number" required/>
+            </label>
+            <label>
+                <b>Trucks:</b>
+                <input name="truck_count" value="0" type="number" required/>
+            </label>
+            <label>
+                <b>Distance:</b>
+                <input name="distance_meters" value="0" type="number" min="1" required/>
+                <small>meters</small>
+            </label>
+            <label style="margin-top: 4px;">
+                <b style="vertical-align: top;">Notes:</b>
+                <textarea name="note" style="width:145px;" placeholder="example: white V symbol in a square on the trucks"></textarea>
+            </label>
+            <label>
+                <b>Phone:</b>
+                <input name="phone" value="" type="tel" placeholder="0637478433" pattern="0[0-9]{9}" required/>
+            </label>
+            <button type="submit" disabled>Report</button>
+        </form>
+    </section>
+    <section>
+        <h1>Safety</h1>
+        <p>Phone number is used to reach out if Ukrainian defence forces need more details.</p>
+        <p>Reports stored in Amsterdam, The Netherlands; deleted three days after reporting.</p>
+    </section>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function updateLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.querySelector('input[name="latitude"]').value = latitude;
+            document.querySelector('input[name="longitude"]').value = longitude;
+            document.querySelector('span#latitude').textContent = latitude + '°';
+            document.querySelector('span#longitude').textContent = longitude + '°';
+            document.querySelector('button[type="submit"]').disabled = false;
+        }
+
+        function blockSubmit() {
+            reportBtn.disabled = true;
+        }
+
+        navigator.geolocation.getCurrentPosition(updateLocation, blockSubmit)
+    </script>
+{% endblock %}

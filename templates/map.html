@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Civil Reconnaissance{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="static/vendor/leaflet.css"/>
+    <style>
+        th {
+            text-align: left;
+        }
+
+        td {
+            font-size: 12px;
+        }
+
+        #map {
+            display: block;
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <section>
+        <h1>Map</h1>
+        <p>Reports are marked with red, the center is where the report comes from, the radius is the distance, click on the circles to see the report.</p>
+        <div id="map"></div>
+    </section>
+
+    <section>
+        <h1>Latest reports</h1>
+        <table>
+            <thead>
+            <tr>
+                <th style="width: 120px;">IP</th>
+                <th style="width: 300px;">Time</th>
+                <th style="width: 400px;">Location</th>
+                <th style="width: 100px;">Soldiers</th>
+                <th style="width: 100px;">Tanks</th>
+                <th style="width: 100px;">Trucks</th>
+                <th style="width: 200px;">Distance</th>
+                <th>Note</th>
+                <th>Phone</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>
+                        <pre>{{ report.created_by }}</pre>
+                    </td>
+                    <td>
+                        <pre>{{ report.created_at }}</pre>
+                    </td>
+                    <td>
+                        <pre>{{ report.latitude }}°, {{ report.longitude }}°</pre>
+                    </td>
+                    <td>{{ report.soldier_count }}</td>
+                    <td>{{ report.tank_count }}</td>
+                    <td>{{ report.truck_count }}</td>
+                    <td>{{ report.distance_meters }} meters</td>
+                    <td>{{ report.note }}</td>
+                    <td><a href="tel:{{ report.phone }}">{{ report.phone }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}
+{% block js %}
+    {# DATA #}
+    <script type="text/javascript">
+        var REPORTS = {{ dict_reports|tojson|safe }};
+    </script>
+    {# 1.7.1 #}
+    {# https://leaflet-extras.github.io/leaflet-providers/preview/ for later tile #}
+    <script src="static/vendor/leaflet.js"></script>
+    <script type="text/javascript">
+        var map = L.map('map').setView([49.508754, 30.731203], 6);
+
+        // Tiles.
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Controls.
+        L.control.scale({metric: true, imperial: false}).addTo(map);
+
+        // Markers.
+        function makeCircle(report) {
+            var res = L.circle([report.latitude, report.longitude], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: report.distance_meters
+            });
+            res.bindPopup(`
+                 <table>
+                <thead>
+                <tr>
+                    <th style="min-width: 100px;">Time</th>
+                    <th style="min-width: 60px;">Soldiers</th>
+                    <th style="min-width: 60px;">Tanks</th>
+                    <th style="min-width: 60px;">Trucks</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><pre>${new Date(report.created_at).toLocaleString('ua-UA', {timeStyle: 'short', dateStyle:'short', hour12: false})}</pre></td>
+                        <td><pre>${report.soldier_count}</pre></td>
+                        <td><pre>${report.tank_count}</pre></td>
+                        <td><pre>${report.truck_count}</pre></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <h4>Note</h4>
+            <span>${report.note}</span>
+            <br>
+            <br>
+            <h4>Tel</h4>
+            <a href="tel:${report.phone}">${report.phone}</a>
+            `)
+            return res;
+        }
+
+        // Pin reports.
+        REPORTS.map(makeCircle).forEach(c => c.addTo(map));
+
+    </script>
+{% endblock %}

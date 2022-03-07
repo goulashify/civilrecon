@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Civil Reconnaissance{% endblock %}
+{% block main %}
+    <section>
+        <h1>Report saved</h1>
+        <p>Thank you, you will be redirected to the reporting page in a few seconds.</p>
+    </section>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        setTimeout(function () {
+            window.location = '/'
+        }, 3000)
+    </script>
+{% endblock %}

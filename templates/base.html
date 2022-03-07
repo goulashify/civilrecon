@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/main.css">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+<main>
+   {% block main %}{% endblock %}
+</main>
+
+<footer>
+    <div><a href="https://jazzware.io">Jazzware</a>© 2022</div>
+</footer>
+
+{% block js %}{% endblock %}
+</body>
+
+</html>
